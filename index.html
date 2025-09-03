@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ViralClipSite User Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+.card:hover {transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.12);}
+.no-scrollbar::-webkit-scrollbar {display: none;}
+.no-scrollbar {-ms-overflow-style: none; scrollbar-width: none;}
+.fade-in {opacity: 0; transform: translateY(10px); animation: fadeIn 0.4s forwards;}
+@keyframes fadeIn {to {opacity:1; transform: translateY(0);}}
+</style>
+</head>
+<body class="bg-zinc-50 text-zinc-900">
+
+<script type='text/javascript' src='//pl27567839.revenuecpmgate.com/a9/c2/9b/a9c29bb93c693550e371884e107638da.js'></script>
+
+<script type='text/javascript' src='//pl27567836.revenuecpmgate.com/b7/89/e0/b789e0c98de9d3e041813ec7ed2b20c0.js'></script>
+
+<header class="sticky top-0 bg-white shadow-sm z-50">
+<div class="mx-auto max-w-7xl px-3 py-4 flex items-center justify-between">
+<a href="index.html" class="flex items-center gap-2">
+<div class="flex items-center justify-center h-10 w-10 rounded-xl bg-red-600 text-white font-bold text-lg">VC</div>
+<span class="text-2xl font-extrabold tracking-tight"><span class="text-red-600">Viral</span>Clip<span class="text-indigo-600">Site</span></span>
+</a>
+
+<div class="flex items-center gap-2">
+<button id="searchIconBtn" class="p-2 rounded-lg hover:bg-zinc-100" aria-label="Search">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 text-zinc-700">
+<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
+</svg>
+</button>
+<button id="hamburgerBtn" class="p-2 border rounded-lg" aria-label="Menu">☰</button>
+</div>
+</div>
+
+<div id="mobileMenu" class="hidden flex-col bg-white border-t border-zinc-200"></div>
+</header>
+
+<div id="searchOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-start justify-center pt-24">
+<div class="bg-white rounded-lg p-4 w-11/12 max-w-md">
+<div class="flex gap-2">
+<input id="searchInput" type="text" placeholder="Search by title or category…" class="flex-1 rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500" />
+<button id="searchBtnOverlay" class="bg-indigo-600 px-3 py-2 text-white rounded-lg hover:bg-indigo-500">Search</button>
+<button id="closeSearch" class="px-2 py-2 text-zinc-500">✖</button>
+</div>
+</div>
+</div>
+
+<main class="mx-auto max-w-7xl px-3 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+<section class="lg:col-span-9 space-y-6">
+<div class="my-6">
+<script type="text/javascript">
+atOptions = {
+'key' : 'fc83c4b5489609fd6197ba57b708e37e',
+'format' : 'iframe',
+'height' : 300,
+'width' : 160,
+'params' : {}
+};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/fc83c4b5489609fd6197ba57b708e37e/invoke.js"></script>
+</div>
+<div>
+<h2 class="text-xl font-bold mb-4">Videos</h2>
+<div id="cards" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+<div class="flex justify-center mt-4 gap-2" id="pagination"></div>
+</div>
+</section>
+
+<aside class="lg:col-span-3 sticky top-6 space-y-6">
+<div class="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+<h4 class="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-600">Popular</h4>
+<ul id="popular" class="space-y-3"></ul>
+</div>
+<div class="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+<script async="async" data-cfasync="false" src="//pl27567855.revenuecpmgate.com/fb09d6407ac157ec683f94e1a6428f14/invoke.js"></script>
+<div id="container-fb09d6407ac157ec683f94e1a6428f14"></div>
+</div>
+</aside>
+</main>
+
+<footer class="mt-8 border-t border-zinc-200 bg-white">
+<div class="bg-zinc-50 text-center text-xs text-zinc-500 py-4">© <span id="year"></span> ViralClipSite.</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+const firebaseConfig = {
+apiKey: "AIzaSyBfp8r9Gs9YQGL_cagTwHDGzU_5z7mub_Q",
+authDomain: "mmcinemas-d8a5a.firebaseapp.com",
+databaseURL: "https://mmcinemas-d8a5a-default-rtdb.firebaseio.com",
+projectId: "mmcinemas-d8a5a",
+storageBucket: "mmcinemas-d8a5a.appspot.com",
+messagingSenderId: "666201191880",
+appId: "1:666201191880:web:62fe1f5763ce17415a3cfd"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let allPosts = [];
+let currentPage = 1;
+const perPage = 20;
+let currentCategory = null;
+let currentSearch = "";
+
+// Clear node helper
+function clearNode(node){while(node.firstChild) node.removeChild(node.firstChild);}
+
+// Render cards
+function mountCards(list, mountId){
+const mount = document.getElementById(mountId);
+clearNode(mount);
+list.forEach(p=>{
+const card = document.createElement("div");
+card.className = "group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm hover:shadow-md transition card fade-in cursor-pointer";
+card.innerHTML=`
+<a href="video-detail.html?title=${encodeURIComponent(p.title)}&category=${encodeURIComponent(p.category)}&date=${encodeURIComponent(p.date)}&image=${encodeURIComponent(p.image)}&videoUrl=${encodeURIComponent(p.videoUrl)}" target="_blank" class="block aspect-[16/9] bg-black">
+<img src="${p.image||'https://picsum.photos/seed/fallback/800/450'}" alt="${p.title}" class="w-full h-full object-contain"/>
+</a>
+<div class="p-4">
+<div class="mb-2 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+<span class="rounded bg-zinc-100 px-1.5 py-0.5">${p.category}</span>
+<span>•</span><time>${p.date}</time>
+</div>
+<a href="video-detail.html?title=${encodeURIComponent(p.title)}&category=${encodeURIComponent(p.category)}&date=${encodeURIComponent(p.date)}&image=${encodeURIComponent(p.image)}&videoUrl=${encodeURIComponent(p.videoUrl)}" target="_blank" class="block font-semibold leading-tight group-hover:text-indigo-600">${p.title}</a>
+</div>`;
+mount.appendChild(card);
+});
+}
+
+// Render pagination
+function renderPagination(total){
+const pages = Math.ceil(total/perPage);
+const container = document.getElementById("pagination");
+clearNode(container);
+for(let i=1;i<=pages;i++){
+const btn = document.createElement("button");
+btn.textContent = i;
+btn.className = `px-3 py-1 border rounded ${i===currentPage?'bg-indigo-600 text-white':'bg-white text-zinc-700'}`;
+btn.onclick = () => { currentPage=i; renderPosts(); }
+container.appendChild(btn);
+}
+}
+
+// Filter & render posts
+function renderPosts(){
+let filtered = allPosts;
+if(currentCategory) filtered = filtered.filter(p=>p.category===currentCategory);
+if(currentSearch) filtered = filtered.filter(p=>p.title.toLowerCase().includes(currentSearch) || p.category.toLowerCase().includes(currentSearch));
+const start = (currentPage-1)*perPage;
+const pageData = filtered.slice(start,start+perPage);
+mountCards(pageData,"cards");
+renderPagination(filtered.length);
+}
+
+// Load Firebase posts
+function loadPosts(){
+db.ref("posts").on("value", snap=>{
+allPosts=[];
+snap.forEach(child=>{
+const p=child.val();
+allPosts.push({
+title:p.title||"Untitled",
+category:p.category||"General",
+date:p.date||new Date().toLocaleDateString(),
+image:p.image||`https://picsum.photos/seed/${child.key}/800/450`,
+videoUrl:p.videoUrl||""
+});
+});
+allPosts.reverse();
+populateHamburgerCategories();
+renderPosts();
+populatePopular();
+});
+}
+
+// Hamburger categories
+function populateHamburgerCategories(){
+const mobileMenu = document.getElementById("mobileMenu");
+clearNode(mobileMenu);
+let categories = [...new Set(allPosts.map(p=>p.category))];
+categories.forEach(cat=>{
+const mobA=document.createElement("a");
+mobA.href="#"; mobA.textContent=cat; mobA.className="block px-4 py-2 hover:bg-zinc-100";
+mobA.onclick=()=>{
+currentCategory=cat;
+currentSearch="";
+currentPage=1;
+renderPosts();
+mobileMenu.classList.add("hidden");
+}
+mobileMenu.appendChild(mobA);
+});
+}
+
+// Popular section
+function populatePopular(){
+const popular=document.getElementById("popular");
+clearNode(popular);
+allPosts.slice(0,5).forEach(p=>{
+const li=document.createElement("li");
+li.innerHTML=`
+<a href="video-detail.html?title=${encodeURIComponent(p.title)}&category=${encodeURIComponent(p.category)}&date=${encodeURIComponent(p.date)}&image=${encodeURIComponent(p.image)}&videoUrl=${encodeURIComponent(p.videoUrl)}" target="_blank" class="group flex gap-3">
+<img src="${p.image}" class="h-14 w-24 rounded-lg object-contain bg-black"/>
+<div>
+<div class="text-xs text-zinc-500">${p.category} • ${p.date}</div>
+<div class="font-medium group-hover:text-indigo-600">${p.title}</div>
+</div>
+</a>`;
+popular.appendChild(li);
+});
+}
+
+// Search handlers
+const searchOverlay=document.getElementById("searchOverlay");
+const searchInput=document.getElementById("searchInput");
+document.getElementById("searchIconBtn").onclick=()=>{searchOverlay.classList.remove("hidden"); searchInput.focus();};
+document.getElementById("closeSearch").onclick=()=>searchOverlay.classList.add("hidden");
+document.getElementById("searchBtnOverlay").onclick=()=>{
+currentSearch = searchInput.value.toLowerCase().trim();
+currentCategory=null;
+currentPage=1;
+renderPosts();
+searchOverlay.classList.add("hidden");
+searchInput.value="";
+}
+
+// Hamburger toggle
+document.getElementById("hamburgerBtn").onclick=()=>{document.getElementById("mobileMenu").classList.toggle("hidden");}
+
+window.onload=loadPosts;
+</script>
+</body>
+</html>
